@@ -20,12 +20,12 @@ methods. That is all. And this library gives it to you. Now, you do not need to 
 
 # Main features
 
- • very simple to use
+ • Very simple to use
  
  • PEM-format serialization is supported
  
  • Tested under Windows XP/7/8/8.1/10
 
 
-
+# Usage
 Usage example you can find inside /main.go file
