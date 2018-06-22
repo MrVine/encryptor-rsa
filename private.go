@@ -15,22 +15,39 @@ func (e *RsaEncryptor) SavePrivateKeyInFile(filePath string) error {
 	}
 	defer file.Close()
 
-	file.WriteString(e.GetPrivateKeyAsPem())
+	content, err := e.GetPrivateKeyAsPem()
+	if err != nil {
+		return err
+	}
+
+	file.WriteString(content)
 
 	return nil
 }
 
-func (e *RsaEncryptor) GetPrivateKeyAsPem() string {
+func (e *RsaEncryptor) GetPrivateKeyAsPem() (p string, err error) {
 
-	bytes := x509.MarshalPKCS1PrivateKey(&e.PrivateKey)
-	p := pem.EncodeToMemory(
-		&pem.Block{
-			Type:  "RSA PRIVATE KEY",
-			Bytes: bytes,
-		},
-	)
+	block := &pem.Block{
+		Type:  "RSA PRIVATE KEY",
+		Bytes: x509.MarshalPKCS1PrivateKey(&e.PrivateKey),
+	}
 
-	return string(p)
+	if e.Password != "" {
+		block, err = x509.EncryptPEMBlock(
+			randReader,
+			block.Type,
+			block.Bytes,
+			[]byte(e.Password),
+			x509.PEMCipherAES256,
+		)
+		if err != nil {
+			return
+		}
+	}
+
+	p = string(pem.EncodeToMemory(block))
+
+	return
 }
 
 func (e *RsaEncryptor) SetPrivateKeyFromPEM(privateKeyString string) error {

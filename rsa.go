@@ -4,6 +4,7 @@ import (
 	"crypto/rsa"
 	"crypto/rand"
 	"crypto/sha256"
+	"errors"
 )
 
 var (
@@ -18,29 +19,23 @@ const (
 type RsaEncryptor struct {
 	PrivateKey rsa.PrivateKey
 	PublicKey  rsa.PublicKey
-}
-
-func GenerateEncryptor(keyLength int) (e RsaEncryptor, err error) {
-
-	key, err := rsa.GenerateKey(randReader, keyLength)
-	if err != nil {
-		return e, err
-	}
-
-	e = RsaEncryptor{
-		PrivateKey: *key,
-		PublicKey:  key.PublicKey,
-	}
-
-	return e, nil
-}
-
-func GenerateVoidEncryptor() RsaEncryptor {
-	return RsaEncryptor{}
+	Password   string
 }
 
 func GetEncryptedDataLength() int {
 	return 344
+}
+
+func (e *RsaEncryptor) Execute(command string, message string) (string, error) {
+
+	switch command {
+	case "encrypt":
+		return e.Encrypt(message)
+	case "decrypt":
+		return e.Decrypt(message)
+	default:
+		return "", errors.New("unsupported command: " + command)
+	}
 }
 
 func (e *RsaEncryptor) EncryptBytes(plain []byte) ([]byte, error) {
