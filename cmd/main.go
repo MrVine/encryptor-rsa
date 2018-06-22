@@ -1,7 +1,7 @@
 package main
 
 import (
-	rsa "encryptor-rsa"
+	rsa "github.com/mrvine/encryptor-rsa"
 	"fmt"
 )
 
