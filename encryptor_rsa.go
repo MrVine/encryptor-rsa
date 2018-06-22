@@ -8,28 +8,31 @@ import (
 
 var (
 	randReader = rand.Reader
-	PRIVATE_KEY_FILE_EXTENSION = ".pem"
+)
+
+const (
+	PrivateKeyFileExtension = ".pem"
+	DefaultKeyLength        = 2048
 )
 
 type RsaEncryptor struct {
 	PrivateKey rsa.PrivateKey
-	PublicKey rsa.PublicKey
+	PublicKey  rsa.PublicKey
 }
 
-func GenerateEncryptor(keyLength int) (RsaEncryptor, error) {
-	var rsaEncryptor RsaEncryptor
+func GenerateEncryptor(keyLength int) (e RsaEncryptor, err error) {
 
 	key, err := rsa.GenerateKey(randReader, keyLength)
 	if err != nil {
-		return rsaEncryptor, err
+		return e, err
 	}
 
-	rsaEncryptor = RsaEncryptor{
+	e = RsaEncryptor{
 		PrivateKey: *key,
-		PublicKey: key.PublicKey,
+		PublicKey:  key.PublicKey,
 	}
 
-	return rsaEncryptor, nil
+	return e, nil
 }
 
 func GenerateVoidEncryptor() RsaEncryptor {
