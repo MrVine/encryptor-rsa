@@ -8,40 +8,43 @@ import (
 )
 
 func (e *RsaEncryptor) GetPublicKeyAsPEM() (string, error) {
-	publicKeyBytes, err := x509.MarshalPKIXPublicKey(&e.PublicKey)
-	//publicKeyBytes, err := asn1.Marshal(e.PublicKey)
+
+	bytes, err := x509.MarshalPKIXPublicKey(&e.PublicKey)
 	if err != nil {
 		return "", err
 	}
-	publicKeyPem := pem.EncodeToMemory(
+
+	p := pem.EncodeToMemory(
 		&pem.Block{
 			Type:  "RSA PUBLIC KEY",
-			Bytes: publicKeyBytes,
+			Bytes: bytes,
 		},
 	)
-	return string(publicKeyPem), nil
+	return string(p), nil
 }
 
 func (e *RsaEncryptor) SetPublicKeyFromPEM(publicKeyString string) error {
+
 	block, _ := pem.Decode([]byte(publicKeyString))
 	if block == nil {
-		return errors.New("Failed to parse PEM block containing the key: block is nil")
-	}
-	if block.Type != "RSA PUBLIC KEY" {
-		return errors.New("Failed to parse PEM block containing the key: block.Type is " + block.Type)
+		return errors.New("failed to parse PEM block: block is nil")
 	}
 
-	publicKey, err := x509.ParsePKIXPublicKey(block.Bytes)
+	if block.Type != "RSA PUBLIC KEY" {
+		return errors.New("failed to parse PEM block: block has incorrect type")
+	}
+
+	key, err := x509.ParsePKIXPublicKey(block.Bytes)
 	if err != nil {
 		return err
 	}
 
-	switch publicKeyConcreteType := publicKey.(type) {
+	switch keyType := key.(type) {
 	case *rsa.PublicKey:
-		e.PublicKey = *publicKeyConcreteType
+		e.PublicKey = *keyType
 		return nil
 	default:
-		return errors.New("Key type is not RSA")
+		return errors.New("key type is not RSA")
 	}
 
 }

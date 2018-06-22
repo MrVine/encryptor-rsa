@@ -43,39 +43,57 @@ func GetEncryptedDataLength() int {
 	return 344
 }
 
-func (e *RsaEncryptor) EncryptBytes(source []byte) ([]byte, error) {
-	cipherText, err := rsa.EncryptOAEP(sha256.New(), randReader, &e.PublicKey, source, []byte(""))
+func (e *RsaEncryptor) EncryptBytes(plain []byte) ([]byte, error) {
+
+	cipher, err := rsa.EncryptOAEP(
+		sha256.New(),
+		randReader,
+		&e.PublicKey,
+		plain,
+		[]byte(""),
+	)
+
 	if err != nil {
 		return nil, err
 	}
-	return []byte(toBase64(cipherText)), nil
+
+	return []byte(toBase64(cipher)), nil
 }
 
-func (e *RsaEncryptor) Encrypt(plainData string) (string, error) {
-	encrypted, err := e.EncryptBytes([]byte(plainData))
+func (e *RsaEncryptor) Encrypt(plain string) (string, error) {
+
+	encrypted, err := e.EncryptBytes([]byte(plain))
 	if err != nil {
 		return "", err
 	}
+
 	return string(encrypted), nil
 }
 
-func (e *RsaEncryptor) DecryptBytes(source []byte) ([]byte, error) {
-	b64, err := fromBase64(string(source))
+func (e *RsaEncryptor) DecryptBytes(encrypted []byte) ([]byte, error) {
+
+	decoded, err := fromBase64(string(encrypted))
 	if err != nil {
 		return nil, err
 	}
-	sourceDecoded := []byte(b64)
-	decryptedBytes, err := rsa.DecryptOAEP(sha256.New(), randReader, &e.PrivateKey, sourceDecoded, []byte(""))
-	if err != nil {
-		return nil, err
-	}
-	return decryptedBytes, nil
+
+	decrypted, err := rsa.DecryptOAEP(
+		sha256.New(),
+		randReader,
+		&e.PrivateKey,
+		[]byte(decoded),
+		[]byte(""),
+	)
+
+	return decrypted, nil
 }
 
 func (e *RsaEncryptor) Decrypt(encryptedData string) (string, error) {
-	decrypted, err := e.DecryptBytes( []byte(encryptedData) )
+
+	decrypted, err := e.DecryptBytes([]byte(encryptedData))
 	if err != nil {
 		return "", err
 	}
+
 	return string(decrypted), nil
 }
