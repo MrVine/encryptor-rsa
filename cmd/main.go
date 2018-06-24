@@ -67,7 +67,7 @@ func encrypt(args RsaArgs) (string, error){
 		)
 	}
 
-	err = e.SetPublicKeyFromPEM(string(bytes))
+	err = e.SetPublicKeyFromPem(string(bytes))
 	if err != nil {
 		return "", errors.Wrap(err, "can not set public key")
 	}
@@ -92,7 +92,7 @@ func decrypt(args RsaArgs) (string, error) {
 		)
 	}
 
-	err = e.SetPrivateKeyFromPEM(string(bytes))
+	err = e.SetPrivateKeyFromPem(string(bytes))
 	if err != nil {
 		return "", errors.Wrap(err, "can not set private key")
 	}

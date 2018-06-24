@@ -25,7 +25,7 @@ func (e *RsaEncryptor) GetPublicKeyAsPem() (string, error) {
 	return string(p), nil
 }
 
-func (e *RsaEncryptor) SetPublicKeyFromPEM(publicKeyString string) error {
+func (e *RsaEncryptor) SetPublicKeyFromPem(publicKeyString string) error {
 
 	block, _ := pem.Decode([]byte(publicKeyString))
 	if block == nil {
@@ -76,7 +76,7 @@ func (e *RsaEncryptor) GetPrivateKeyAsPem() (p string, err error) {
 	return
 }
 
-func (e *RsaEncryptor) SetPrivateKeyFromPEM(privateKeyString string) error {
+func (e *RsaEncryptor) SetPrivateKeyFromPem(privateKeyString string) (err error) {
 
 	decoded, _ := pem.Decode([]byte(privateKeyString))
 	if decoded == nil {
