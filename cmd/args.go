@@ -4,11 +4,11 @@ import
 (
 	"flag"
 	"os"
-	"strconv"
-	rsa "github.com/mrvine/encryptor-rsa"
 	"crypto/rand"
 	"fmt"
 	"errors"
+	"strconv"
+	rsa "github.com/mrvine/encryptor-rsa"
 )
 
 type RsaArgs struct {
@@ -86,22 +86,25 @@ func getArgs() (args RsaArgs, err error) {
 		return
 	}
 
-	if *keyLengthStr == "" {
-		*keyLengthStr = "0"
+	if *command == "generate" {
+		if *keyLengthStr == "" {
+			*keyLengthStr = "0"
+		}
+
+		keyLength32, err := strconv.ParseInt(*keyLengthStr, 10, 32)
+		keyLength := int(keyLength32)
+		if err != nil || !rsa.IsValidKeyLength(keyLength) {
+			yellowConsole.Println(
+				"incorrect key length. default key length",
+				rsa.DefaultKeyLength,
+				"bits will be used",
+			)
+			keyLength = rsa.DefaultKeyLength
+		}
+
+		args.KeyLength = keyLength
 	}
 
-	keyLength32, err := strconv.ParseInt(*keyLengthStr, 10, 32)
-	keyLength := int(keyLength32)
-	if err != nil || !rsa.IsValidKeyLength(keyLength) {
-		yellowConsole.Println(
-			"incorrect key length. default key length",
-			rsa.DefaultKeyLength,
-			"bits will be used",
-		)
-		keyLength = rsa.DefaultKeyLength
-	}
-
-	args.KeyLength = keyLength
 
 	args.PublicKeyPath = *publicKeyFile
 	args.PrivateKeyPath = *privateKeyFile

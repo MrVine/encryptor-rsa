@@ -11,7 +11,7 @@ func demonstration() {
 	// ----------------- SIDE #1 ------------------
 
 	// Initialize encryptor1
-	encryptor1, _ := rsa.Init(rsa.DefaultKeyLength)
+	encryptor1, _ := rsa.Init()
 
 	// Retrieve public key to send it to SIDE #2
 	publicKey, _ := encryptor1.GetPublicKeyAsPem()

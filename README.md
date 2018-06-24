@@ -3,7 +3,16 @@
 * to encrypt/decrypt data via RSA OAEP encryption algorithm
 * to serialize/deserialize RSA OAEP keys in PEM format (with password protection).
 
-Also, within this repo you can find console application (in `cmd/` folder), which allows 
+Within this repo you can find `demonstration` console application, which demonstrate main ideas of this library.
+
+Also, within this repo you can find `cmd` console application, which allows to:
+* generate public/private keys
+* encrypt message with existing public key
+* decrypt message with existing private key
+
+Private key can be protected by password.
+
+![](/images/scr_description.png)
 
 # Usage example
 

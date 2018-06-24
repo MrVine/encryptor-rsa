@@ -21,7 +21,7 @@ func generate(args RsaArgs) (string, error) {
 	var err error
 
 	if args.PrivateKeyPassword == "" {
-		e, err = rsa.Init(args.KeyLength)
+		e, err = rsa.InitWithKeyLength(args.KeyLength)
 	} else {
 		e, err = rsa.InitWithPassword(args.KeyLength, args.PrivateKeyPassword)
 	}
