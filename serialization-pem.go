@@ -9,6 +9,7 @@ import (
 	"fmt"
 )
 
+// GetPublicKeyAsPem allows to get public key in PEM-encoded string
 func (e *RsaEncryptor) GetPublicKeyAsPem() (string, error) {
 
 	bytes, err := x509.MarshalPKIXPublicKey(&e.PublicKey)
@@ -25,6 +26,8 @@ func (e *RsaEncryptor) GetPublicKeyAsPem() (string, error) {
 	return string(p), nil
 }
 
+// SetPublicKeyFromPem allows to set public key to current instance
+// of RsaEncryptor from PEM-encoded string.
 func (e *RsaEncryptor) SetPublicKeyFromPem(publicKeyString string) error {
 
 	block, _ := pem.Decode([]byte(publicKeyString))
@@ -51,6 +54,9 @@ func (e *RsaEncryptor) SetPublicKeyFromPem(publicKeyString string) error {
 
 }
 
+// GetPrivateKeyAsPem allows to get private key in PEM-encoded string.
+// If e.Password is not empty - private key will be encrypted
+// via AES 256 CBC encryption algorithm, where key is e.Password.
 func (e *RsaEncryptor) GetPrivateKeyAsPem() (p string, err error) {
 
 	block := &pem.Block{
@@ -76,6 +82,9 @@ func (e *RsaEncryptor) GetPrivateKeyAsPem() (p string, err error) {
 	return
 }
 
+// SetPrivateKeyFromPem allows to set private key to current instance
+// of RsaEncryptor from PEM-encoded string. If private key was encrypted -
+// this method will try to decrypt via password from e.Password field.
 func (e *RsaEncryptor) SetPrivateKeyFromPem(privateKeyString string) (err error) {
 
 	decoded, _ := pem.Decode([]byte(privateKeyString))
@@ -109,6 +118,7 @@ func (e *RsaEncryptor) SetPrivateKeyFromPem(privateKeyString string) (err error)
 	return nil
 }
 
+// SavePublicKeyInPem allows to save current public key to file.
 func (e *RsaEncryptor) SavePublicKeyInPem(filePath string) error {
 
 	content, err := e.GetPublicKeyAsPem()
@@ -119,6 +129,7 @@ func (e *RsaEncryptor) SavePublicKeyInPem(filePath string) error {
 	return createFile(filePath, content)
 }
 
+// SavePrivateKeyInPem allows to save current private key to file.
 func (e *RsaEncryptor) SavePrivateKeyInPem(filePath string) error {
 
 	content, err := e.GetPrivateKeyAsPem()
