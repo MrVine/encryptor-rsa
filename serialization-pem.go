@@ -5,6 +5,8 @@ import (
 	"encoding/pem"
 	"errors"
 	"crypto/rsa"
+	pkg_errors"github.com/pkg/errors"
+	"fmt"
 )
 
 func (e *RsaEncryptor) GetPublicKeyAsPem() (string, error) {
@@ -23,7 +25,7 @@ func (e *RsaEncryptor) GetPublicKeyAsPem() (string, error) {
 	return string(p), nil
 }
 
-func (e *RsaEncryptor) SetPublicKeyFromPEM(publicKeyString string) error {
+func (e *RsaEncryptor) SetPublicKeyFromPem(publicKeyString string) error {
 
 	block, _ := pem.Decode([]byte(publicKeyString))
 	if block == nil {
@@ -74,19 +76,31 @@ func (e *RsaEncryptor) GetPrivateKeyAsPem() (p string, err error) {
 	return
 }
 
-func (e *RsaEncryptor) SetPrivateKeyFromPEM(privateKeyString string) error {
+func (e *RsaEncryptor) SetPrivateKeyFromPem(privateKeyString string) (err error) {
 
-	block, _ := pem.Decode([]byte(privateKeyString))
-	if block == nil {
+	decoded, _ := pem.Decode([]byte(privateKeyString))
+	if decoded == nil {
 		return errors.New("failed to parse PEM block containing the key: block is nil")
 	}
 
-	if block.Type != "RSA PRIVATE KEY" {
-		return errors.New("failed to parse PEM block containing the key: block.type is " + block.Type)
+	if decoded.Type != "RSA PRIVATE KEY" {
+		return errors.New("failed to parse PEM block containing the key: block.type is " + decoded.Type)
 	}
 
-	x509.DecryptPEMBlock(block, []byte(e.Password))
-	key, err := x509.ParsePKCS1PrivateKey(block.Bytes)
+	var bytes []byte
+
+	if x509.IsEncryptedPEMBlock(decoded) {
+		bytes, err = x509.DecryptPEMBlock(decoded, []byte(e.Password))
+		if err != nil {
+			return pkg_errors.Wrap(err, "can not decrypt private key")
+		}
+		fmt.Println("private key is decrypted")
+	} else {
+		bytes = []byte(decoded.Bytes)
+		fmt.Println("private key was not decrypted")
+	}
+
+	key, err := x509.ParsePKCS1PrivateKey(bytes)
 	if err != nil {
 		return err
 	}
