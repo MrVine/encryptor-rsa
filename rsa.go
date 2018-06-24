@@ -24,7 +24,21 @@ type RsaEncryptor struct {
 	Password   string
 }
 
-func Init(keyLength int) (e RsaEncryptor, err error) {
+// Init initializes RsaEncryptor with default key length,
+// empty password and just generated public/private keys.
+func Init() (e RsaEncryptor, err error) {
+	return InitWithKeyLength(DefaultKeyLength)
+}
+
+// InitWithKeyLength initializes RsaEncryptor with specified
+// key length, empty password and just generated public/private keys.
+func InitWithKeyLength(keyLength int) (e RsaEncryptor, err error) {
+	return InitWithPassword(keyLength, "")
+}
+
+// InitWithPassword initializes RsaEncryptor with specified
+// key length, specified password and just generated public/private keys.
+func InitWithPassword(keyLength int, password string) (e RsaEncryptor, err error) {
 
 	key, err := rsa.GenerateKey(randReader, keyLength)
 	if err != nil {
@@ -34,19 +48,10 @@ func Init(keyLength int) (e RsaEncryptor, err error) {
 	e = RsaEncryptor{
 		PrivateKey: *key,
 		PublicKey:  key.PublicKey,
+		Password:   password,
 	}
 
 	return e, nil
-}
-
-func InitWithPassword(keyLength int, password string) (e RsaEncryptor, err error) {
-
-	e, err = Init(keyLength)
-	if err == nil {
-		e.Password = password
-	}
-
-	return
 }
 
 func InitEmpty() RsaEncryptor {
