@@ -49,8 +49,8 @@ func generate(args RsaArgs) (string, error) {
 	}
 
 	return fmt.Sprintf(
-			"public key is saved to [%s] file,\n" +
-			"and private key is saved to [%s] file",
+			"new public key has been saved to: [%s]\n" +
+			"new private key has been saved to: [%s]",
 			args.PublicKeyPath,
 			args.PrivateKeyPath,),
 		nil
@@ -139,12 +139,7 @@ func main() {
 		return
 	}
 
-	greenConsole.Printf("[%s] command execution is done\n", args.Command)
-
 	if result != "" {
-		greenConsole.Printf(
-			"result: %s\n",
-			result,
-		)
+		greenConsole.Println(result)
 	}
 }
