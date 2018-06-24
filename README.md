@@ -14,21 +14,24 @@ Private key can be protected by password.
 
 ![](/images/scr_description.png)
 
+Also [wiki](https://github.com/MrVine/encryptor-rsa/wiki) page is available.
+
 # Usage example
 
 ## Initialize encryptor
 
-Initialization depends on how do you want to use `RsaEncryptor`. In case of you want to generate new public/private keys **without** password protection, you should use: 
+Initialization depends on how do you want to use `RsaEncryptor`. In case of you want to generate new public/private keys **without** password protection, you can use: 
 ```
-func Init(keyLength int) (RsaEncryptor, error)
+func Init() (e RsaEncryptor, err error)
+func InitWithKeyLength(keyLength int) (e RsaEncryptor, err error) {
 ```
 
-If you want to do the same, but protect your private key **with** a password (using AES 256 CBC encryption) during serialization, you should use:
+If you want to do the same, but protect your private key **with** a password (using AES 256 CBC encryption) during serialization, you can use:
 ```
 func InitWithPassword(keyLength int, password string) (RsaEncryptor, error)
 ```
 
-In case you want to encrypt message with existing public key, or decrypt message with existing **unencrypted private key**, you should use:
+In case you want to encrypt message with existing public key, or decrypt message with existing **unencrypted private key**, you can use:
 ```
 func InitEmpty() (RsaEncryptor, error)
 ```
