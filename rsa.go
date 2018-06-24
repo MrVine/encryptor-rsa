@@ -11,7 +11,7 @@ import (
 
 var (
 	randReader = rand.Reader
-	keyLength = []int{1024, 2048, 4096}
+	keyLength  = []int{1024, 2048, 4096}
 )
 
 const (
@@ -51,6 +51,10 @@ func InitWithPassword(keyLength int, password string) (e RsaEncryptor, err error
 
 func InitEmpty() RsaEncryptor {
 	return RsaEncryptor{}
+}
+
+func InitEmptyWithPassword(password string) RsaEncryptor {
+	return RsaEncryptor{Password: password}
 }
 
 func (e *RsaEncryptor) Encrypt(plain string) (string, error) {

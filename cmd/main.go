@@ -17,7 +17,15 @@ var (
 
 func generate(args RsaArgs) (string, error) {
 
-	e, err := rsa.Init(args.KeyLength)
+	var e rsa.RsaEncryptor
+	var err error
+
+	if args.PrivateKeyPassword == "" {
+		e, err = rsa.Init(args.KeyLength)
+	} else {
+		e, err = rsa.InitWithPassword(args.KeyLength, args.PrivateKeyPassword)
+	}
+
 	if err != nil {
 		return "", errors.Wrap(err, "can not initialize rsa encryptor")
 	}
@@ -69,7 +77,13 @@ func encrypt(args RsaArgs) (string, error){
 
 func decrypt(args RsaArgs) (string, error) {
 
-	e := rsa.InitEmpty()
+	var e rsa.RsaEncryptor
+
+	if args.PrivateKeyPassword == "" {
+		e = rsa.InitEmpty()
+	} else {
+		e = rsa.InitEmptyWithPassword(args.PrivateKeyPassword)
+	}
 
 	bytes, err := ioutil.ReadFile(args.PrivateKeyPath)
 	if err != nil {
