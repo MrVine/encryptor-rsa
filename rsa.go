@@ -18,6 +18,8 @@ const (
 	DefaultKeyLength = 2048
 )
 
+// RsaEncryptor allows to easily use
+// RSA encryption algorithm
 type RsaEncryptor struct {
 	PrivateKey rsa.PrivateKey
 	PublicKey  rsa.PublicKey
@@ -54,14 +56,19 @@ func InitWithPassword(keyLength int, password string) (e RsaEncryptor, err error
 	return e, nil
 }
 
+// InitWithPassword initializes RsaEncryptor with nothing
 func InitEmpty() RsaEncryptor {
 	return RsaEncryptor{}
 }
 
+// InitEmptyWithPassword initializes RsaEncryptor only with
+// specified password (without keys generation).
 func InitEmptyWithPassword(password string) RsaEncryptor {
 	return RsaEncryptor{Password: password}
 }
 
+// Encrypt allows to encrypt plain string using current
+// public key. If public key is not set - error will be produced.
 func (e *RsaEncryptor) Encrypt(plain string) (string, error) {
 
 	encrypted, err := e.EncryptBytes([]byte(plain))
@@ -72,6 +79,8 @@ func (e *RsaEncryptor) Encrypt(plain string) (string, error) {
 	return string(encrypted), nil
 }
 
+// EncryptBytes allows to encrypt plain bytes using current
+// public key. If public key is not set - error will be produced.
 func (e *RsaEncryptor) EncryptBytes(plain []byte) ([]byte, error) {
 
 	cipher, err := rsa.EncryptOAEP(
@@ -89,6 +98,10 @@ func (e *RsaEncryptor) EncryptBytes(plain []byte) ([]byte, error) {
 	return []byte(toBase64(cipher)), nil
 }
 
+// Decrypt allows to decrypt plain string using current
+// private key. If private key is not set - error will be produced.
+// If private key was encrypted, but password is not set - error
+// will be produced.
 func (e *RsaEncryptor) Decrypt(encryptedData string) (string, error) {
 
 	decrypted, err := e.DecryptBytes([]byte(encryptedData))
@@ -99,6 +112,10 @@ func (e *RsaEncryptor) Decrypt(encryptedData string) (string, error) {
 	return string(decrypted), nil
 }
 
+// DecryptBytes allows to decrypt plain string using current
+// private key. If private key is not set - error will be produced.
+// If private key was encrypted, but password is not set - error
+// will be produced.
 func (e *RsaEncryptor) DecryptBytes(encrypted []byte) ([]byte, error) {
 
 	decoded, err := fromBase64(string(encrypted))
@@ -115,16 +132,23 @@ func (e *RsaEncryptor) DecryptBytes(encrypted []byte) ([]byte, error) {
 	)
 }
 
+// GetKeyLength allows to get slice with available
+// key lengths.
 func GetKeyLengths() []int {
 	return keyLength
 }
 
+// GetKeyLengthString allows to get string with
+// available key lengths.
 func GetKeyLengthString() string {
 	str := fmt.Sprint(keyLength)
 	replaced := strings.Replace(str, " ", ", ", -1)
 	return strings.Trim(replaced, "[]")
 }
 
+// IsValidKeyLength allows to check if specified
+// key length is a valid key length for current version
+// of library.
 func IsValidKeyLength(keyLength int) bool {
 	for _, length := range GetKeyLengths() {
 		if keyLength == length {
