@@ -4,16 +4,18 @@ import (
 	"crypto/rsa"
 	"crypto/rand"
 	"crypto/sha256"
-	"errors"
+	"fmt"
+	"strings"
+	"github.com/pkg/errors"
 )
 
 var (
 	randReader = rand.Reader
+	keyLength = []int{1024, 2048, 4096}
 )
 
 const (
-	PrivateKeyFileExtension = ".pem"
-	DefaultKeyLength        = 2048
+	DefaultKeyLength = 2048
 )
 
 type RsaEncryptor struct {
@@ -22,20 +24,43 @@ type RsaEncryptor struct {
 	Password   string
 }
 
-func GetEncryptedDataLength() int {
-	return 344
+func Init(keyLength int) (e RsaEncryptor, err error) {
+
+	key, err := rsa.GenerateKey(randReader, keyLength)
+	if err != nil {
+		return e, err
+	}
+
+	e = RsaEncryptor{
+		PrivateKey: *key,
+		PublicKey:  key.PublicKey,
+	}
+
+	return e, nil
 }
 
-func (e *RsaEncryptor) Execute(command string, message string) (string, error) {
+func InitWithPassword(keyLength int, password string) (e RsaEncryptor, err error) {
 
-	switch command {
-	case "encrypt":
-		return e.Encrypt(message)
-	case "decrypt":
-		return e.Decrypt(message)
-	default:
-		return "", errors.New("unsupported command: " + command)
+	e, err = Init(keyLength)
+	if err == nil {
+		e.Password = password
 	}
+
+	return
+}
+
+func InitEmpty() RsaEncryptor {
+	return RsaEncryptor{}
+}
+
+func (e *RsaEncryptor) Encrypt(plain string) (string, error) {
+
+	encrypted, err := e.EncryptBytes([]byte(plain))
+	if err != nil {
+		return "", errors.Wrap(err, "can not encrypt bytes")
+	}
+
+	return string(encrypted), nil
 }
 
 func (e *RsaEncryptor) EncryptBytes(plain []byte) ([]byte, error) {
@@ -55,14 +80,14 @@ func (e *RsaEncryptor) EncryptBytes(plain []byte) ([]byte, error) {
 	return []byte(toBase64(cipher)), nil
 }
 
-func (e *RsaEncryptor) Encrypt(plain string) (string, error) {
+func (e *RsaEncryptor) Decrypt(encryptedData string) (string, error) {
 
-	encrypted, err := e.EncryptBytes([]byte(plain))
+	decrypted, err := e.DecryptBytes([]byte(encryptedData))
 	if err != nil {
-		return "", err
+		return "", errors.Wrap(err, "can not decrypt bytes")
 	}
 
-	return string(encrypted), nil
+	return string(decrypted), nil
 }
 
 func (e *RsaEncryptor) DecryptBytes(encrypted []byte) ([]byte, error) {
@@ -72,23 +97,30 @@ func (e *RsaEncryptor) DecryptBytes(encrypted []byte) ([]byte, error) {
 		return nil, err
 	}
 
-	decrypted, err := rsa.DecryptOAEP(
+	return rsa.DecryptOAEP(
 		sha256.New(),
 		randReader,
 		&e.PrivateKey,
 		[]byte(decoded),
 		[]byte(""),
 	)
-
-	return decrypted, nil
 }
 
-func (e *RsaEncryptor) Decrypt(encryptedData string) (string, error) {
+func GetKeyLengths() []int {
+	return keyLength
+}
 
-	decrypted, err := e.DecryptBytes([]byte(encryptedData))
-	if err != nil {
-		return "", err
+func GetKeyLengthString() string {
+	str := fmt.Sprint(keyLength)
+	replaced := strings.Replace(str, " ", ", ", -1)
+	return strings.Trim(replaced, "[]")
+}
+
+func IsValidKeyLength(keyLength int) bool {
+	for _, length := range GetKeyLengths() {
+		if keyLength == length {
+			return true
+		}
 	}
-
-	return string(decrypted), nil
+	return false
 }
