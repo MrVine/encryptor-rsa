@@ -1,18 +1,17 @@
-# Description
+# encryptor-rsa
 `encryptor-rsa` is a golang library. Using this library you can:
 * to encrypt/decrypt data via RSA OAEP encryption algorithm
 * to serialize/deserialize RSA OAEP keys in PEM format (with password protection).
 
-Within this repo you can find `demonstration` console application, which demonstrate main ideas of this library.
+This repository contains:
+* `encryptor-rsa` library itself
+* `demonstration` - it is console application, which demonstrates main ideas of this library.
+* `cmd` - it is console application, which allows to:
+  * generate public/private keys (private key can be protected by password)
+  * encrypt message with existing public key
+  * decrypt message with existing private key
 
-Also, within this repo you can find `cmd` console application, which allows to:
-* generate public/private keys
-* encrypt message with existing public key
-* decrypt message with existing private key
-
-Private key can be protected by password.
-
-![](/images/scr_description.png)
+![](https://user-images.githubusercontent.com/5161479/41833585-8ba0ab08-7859-11e8-91bf-499d7fe06ac2.png)
 
 Also [wiki](https://github.com/MrVine/encryptor-rsa/wiki) page is available.
 
