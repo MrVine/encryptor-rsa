@@ -1,4 +1,6 @@
 # encryptor-rsa
+![](https://travis-ci.com/MrVine/encryptor-rsa.svg?branch=master)
+
 `encryptor-rsa` is a golang library. Using this library you can:
 * to encrypt/decrypt data via RSA OAEP encryption algorithm
 * to serialize/deserialize RSA OAEP keys in PEM format (with password protection).
